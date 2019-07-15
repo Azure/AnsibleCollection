@@ -1,0 +1,16 @@
+- hosts: localhost
+  collections:
+    - smile37773.rm
+  tasks:
+    - name: PutManagementGroup
+      managementgroup:
+        group_id: ChildGroup
+        id: /providers/Microsoft.Management/managementGroups/ChildGroup
+        type: /providers/Microsoft.Management/managementGroups/
+        name: ChildGroup
+        properties:
+          tenant_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          display_name: ChildGroup
+          details:
+            parent:
+              id: /providers/Microsoft.Management/managementGroups/RootGroup

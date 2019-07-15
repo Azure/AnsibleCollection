@@ -1,0 +1,12 @@
+namespace: "smile37773"
+name: "rm"
+version: "0.0.4"
+readme: "README.md"
+authors:
+    - "Liu Qingyi"
+license:
+    - "MIT"
+tags:
+    - demo
+    - collection
+repository: "https://github.com/Azure/AnsibleCollection"
