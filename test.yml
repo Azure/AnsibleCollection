@@ -1,7 +1,7 @@
 - hosts: localhost
   tasks:
     - name: PutManagementGroup
-      smile37773.rm.managementgroup:
+      azure.rm.managementgroup:
         group_id: ChildGroup
         id: /providers/Microsoft.Management/managementGroups/ChildGroup
         type: /providers/Microsoft.Management/managementGroups/
@@ -13,10 +13,10 @@
             parent:
               id: /providers/Microsoft.Management/managementGroups/RootGroup
     - name: AddSubscriptionToManagementGroup
-      smile37773.rm.managementgroupsubscription:
+      azure.rm.managementgroupsubscription:
         group_id: myManagementGroup
     - name: Create Subscription
-      smile37773.rm.subscriptionfactory:
+      azure.rm.subscriptionfactory:
         enrollment_account_name: myEnrollmentAccount
         body:
           offerType: MS-AZR-0017P

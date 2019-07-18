@@ -2,7 +2,7 @@
 # Using the collection
 
 ## 1.Install the collection
-    Use the command - "mazer install smile37773.rm"
+    Use the command - "mazer install azure.rm"
 
 ## 2.Using the collection in playooks
     playbook: test.yml
@@ -10,7 +10,7 @@
 - hosts: localhost
   tasks:
     - name: PutManagementGroup
-      smile37773.rm.managementgroup:
+      azure.rm.managementgroup:
         group_id: ChildGroup
         id: /providers/Microsoft.Management/managementGroups/ChildGroup
         type: /providers/Microsoft.Management/managementGroups/
@@ -22,10 +22,10 @@
             parent:
               id: /providers/Microsoft.Management/managementGroups/RootGroup
     - name: AddSubscriptionToManagementGroup
-      smile37773.rm.managementgroupsubscription:
+      azure.rm.managementgroupsubscription:
         group_id: myManagementGroup
     - name: Create Subscription
-      smile37773.rm.subscriptionfactory:
+      azure.rm.subscriptionfactory:
         enrollment_account_name: myEnrollmentAccount
         body:
           offerType: MS-AZR-0017P
@@ -42,7 +42,7 @@
 ```
 - hosts: localhost
   collections:
-    - smile37773.rm
+    - azure.rm
   tasks:
     - name: PutManagementGroup
       managementgroup:
@@ -74,7 +74,7 @@ collection/
 ```
     Collections require a galaxy.yml at the root level of the collection. This file contains all of the metadata that Galaxy and Mazer need in order to package and import a collection.
 ```
-namespace: "smile37773"
+namespace: "azure"
 name: "rm"
 version: "0.0.5"
 readme: "README.md"
@@ -97,4 +97,4 @@ repository: "https://github.com/Azure/AnsibleCollection"
     Way one:
     Open the website: https://galaxy.ansible.com/my-content/namespaces. Click the buttom "Add Content" and upload the file in the releases/ directory.
     Way two:
-    Use the command - “mazer publish --api-key=SECRET path/to/smile37773-rm-0.0.5.tar.gz”. The api-key can be found in https://galaxy.ansible.com/me/preferences.
+    Use the command - “mazer publish --api-key=SECRET path/to/azure-rm-0.0.1.tar.gz”. The api-key can be found in https://galaxy.ansible.com/me/preferences.
