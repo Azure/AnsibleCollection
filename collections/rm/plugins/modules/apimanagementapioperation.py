@@ -889,7 +889,11 @@ import re
 from ansible.module_utils.azure_rm_common_ext import AzureRMModuleBaseExt
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
+try:
+    from msrestazure.azure_exceptions import CloudError
+except ImportError:
+    # this is handled in azure_rm_common
+    pass
 
 
 class Actions:
@@ -1254,6 +1258,9 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                 self.to_do = Actions.Delete
             else:
                 modifiers = {}
+                self.create_compare_modifiers(self.module_arg_spec, '', modifiers)
+                self.results['modifiers'] = modifiers
+                self.results['compare'] = []
                 self.create_compare_modifiers(self.module_arg_spec, '', modifiers)
                 if not self.default_compare(modifiers, self.body, old_response, '', self.results):
                     self.to_do = Actions.Update
