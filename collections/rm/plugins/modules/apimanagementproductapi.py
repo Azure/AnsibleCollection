@@ -46,18 +46,6 @@ options:
         the revision number.
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Type of API.
-    type: str
   description:
     description:
       - Description of the API. May include HTML formatting tags.
@@ -171,7 +159,6 @@ options:
         within the API Management service instance. It is appended to the API
         endpoint base URL specified during the service instance creation to form
         a public URL for this API.
-    required: true
     type: str
   protocols:
     description:
@@ -238,6 +225,7 @@ EXAMPLES = '''
     service_name: myService
     product_id: myProduct
     api_id: myApi
+    path: newapiPath
 - name: ApiManagementDeleteProductApi
   azure.rm.apimanagementproductapi:
     resource_group: myResourceGroup
@@ -300,25 +288,25 @@ class AzureRMProductApi(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             product_id=dict(
                 type='str',
                 updatable=False,
                 disposition='productId',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -426,8 +414,7 @@ class AzureRMProductApi(AzureRMModuleBaseExt):
             ),
             path=dict(
                 type='str',
-                disposition='/properties/*',
-                required=true
+                disposition='/properties/*'
             ),
             protocols=dict(
                 type='list',
@@ -476,9 +463,6 @@ class AzureRMProductApi(AzureRMModuleBaseExt):
         self.service_name = None
         self.product_id = None
         self.api_id = None
-        self.id = None
-        self.name = None
-        self.type = None
         self.properties = None
 
         self.results = dict(changed=False)
@@ -530,8 +514,8 @@ class AzureRMProductApi(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.product_name)
-        self.url = self.url.replace('{{ api_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
 
         old_response = self.get_resource()
 

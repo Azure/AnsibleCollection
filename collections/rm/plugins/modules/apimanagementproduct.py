@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 #!/usr/bin/python
 #
 # Copyright (c) 2019 Zim Kalinowski, (@zikalino)
@@ -93,18 +94,6 @@ options:
       - Product name.
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
 extends_documentation_fragment:
   - azure
 author:
@@ -118,13 +107,7 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     product_id: myProduct
-    display_name: Test Template ProductName 4
-- name: ApiManagementUpdateProduct
-  azure.rm.apimanagementproduct:
-    resource_group: myResourceGroup
-    service_name: myService
-    product_id: myProduct
-    display_name: Test Template ProductName 4
+    display_name: Test Template ProductName
 - name: ApiManagementDeleteProduct
   azure.rm.apimanagementproduct:
     resource_group: myResourceGroup
@@ -253,19 +236,19 @@ class AzureRMProduct(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             product_id=dict(
                 type='str',
                 updatable=False,
                 disposition='productId',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -287,16 +270,16 @@ class AzureRMProduct(AzureRMModuleBaseExt):
                 type='number',
                 disposition='/properties/subscriptionsLimit'
             ),
-            state=dict(
+            pstate=dict(
                 type='str',
-                disposition='/properties/*',
+                disposition='/properties/state',
                 choices=['notPublished',
                          'published']
             ),
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -308,9 +291,6 @@ class AzureRMProduct(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.product_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -359,7 +339,7 @@ class AzureRMProduct(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
 
         old_response = self.get_resource()
 

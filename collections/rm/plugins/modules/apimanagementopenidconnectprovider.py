@@ -59,18 +59,6 @@ options:
     description:
       - Client Secret of developer console which is the client application.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the OpenIdConnectProvider.
@@ -195,23 +183,23 @@ class AzureRMOpenIdConnectProvider(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             opid=dict(
                 type='str',
                 updatable=False,
-                required=true
+                required=True
             ),
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -220,12 +208,12 @@ class AzureRMOpenIdConnectProvider(AzureRMModuleBaseExt):
             metadata_endpoint=dict(
                 type='str',
                 disposition='/properties/metadataEndpoint',
-                required=true
+                required=True
             ),
             client_id=dict(
                 type='str',
                 disposition='/properties/clientId',
-                required=true
+                required=True
             ),
             client_secret=dict(
                 type='str',
@@ -241,9 +229,6 @@ class AzureRMOpenIdConnectProvider(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.opid = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -292,7 +277,7 @@ class AzureRMOpenIdConnectProvider(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ openid_connect_provider_name }}', self.name)
+        self.url = self.url.replace('{{ openid_connect_provider_name }}', self.opid)
 
         old_response = self.get_resource()
 

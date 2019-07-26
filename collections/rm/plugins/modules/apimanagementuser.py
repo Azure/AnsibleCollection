@@ -38,7 +38,7 @@ options:
         instance.
     required: true
     type: str
-  state:
+  ustate:
     description:
       - Assert the state of the User.
       - Use C(present) to create or update an User and C(absent) to delete it.
@@ -128,18 +128,6 @@ options:
             `aad://<tenant>.onmicrosoft.com/groups/<group object id>`; otherwise
             the value is null.
         type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
 extends_documentation_fragment:
   - azure
 author:
@@ -330,23 +318,23 @@ class AzureRMUser(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             user_id=dict(
                 type='str',
                 updatable=False,
                 disposition='userId',
-                required=true
+                required=True
             ),
-            state=dict(
+            ustate=dict(
                 type='str',
-                disposition='/properties/*',
+                disposition='/properties/state',
                 choices=['active',
                          'blocked',
                          'pending',
@@ -371,17 +359,17 @@ class AzureRMUser(AzureRMModuleBaseExt):
             email=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             first_name=dict(
                 type='str',
                 disposition='/properties/firstName',
-                required=true
+                required=True
             ),
             last_name=dict(
                 type='str',
                 disposition='/properties/lastName',
-                required=true
+                required=True
             ),
             password=dict(
                 type='str',
@@ -404,9 +392,6 @@ class AzureRMUser(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.user_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -455,7 +440,7 @@ class AzureRMUser(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ user_name }}', self.name)
+        self.url = self.url.replace('{{ user_name }}', self.user_id)
 
         old_response = self.get_resource()
 

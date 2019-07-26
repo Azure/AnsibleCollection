@@ -45,22 +45,9 @@ options:
         instance.
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Group type.
-    type: str
   display_name:
     description:
       - Group name.
-    required: true
     type: str
   description:
     description:
@@ -104,6 +91,7 @@ EXAMPLES = '''
     service_name: myService
     product_id: myProduct
     group_id: myGroup
+    display_name: EchoApi
 - name: ApiManagementDeleteProductGroup
   azure.rm.apimanagementproductgroup:
     resource_group: myResourceGroup
@@ -166,30 +154,29 @@ class AzureRMProductGroup(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             product_id=dict(
                 type='str',
                 updatable=False,
                 disposition='productId',
-                required=true
+                required=True
             ),
             group_id=dict(
                 type='str',
                 updatable=False,
                 disposition='groupId',
-                required=true
+                required=True
             ),
             display_name=dict(
                 type='str',
-                disposition='/properties/displayName',
-                required=true
+                disposition='/properties/displayName'
             ),
             description=dict(
                 type='str',
@@ -221,9 +208,6 @@ class AzureRMProductGroup(AzureRMModuleBaseExt):
         self.service_name = None
         self.product_id = None
         self.group_id = None
-        self.id = None
-        self.name = None
-        self.type = None
         self.properties = None
 
         self.results = dict(changed=False)
@@ -275,8 +259,8 @@ class AzureRMProductGroup(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.product_name)
-        self.url = self.url.replace('{{ group_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
+        self.url = self.url.replace('{{ group_name }}', self.group_id)
 
         old_response = self.get_resource()
 

@@ -52,18 +52,6 @@ options:
     description:
       - Format of the policyContent.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ProductPolicy.
@@ -87,14 +75,14 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     product_id: myProduct
-    policy_id: myPolicy
-    value: "<policies>\r\n  <inbound>\r\n    <rate-limit calls=\"{{call-count}}\" renewal-period=\"15\"></rate-limit>\r\n    <log-to-eventhub logger-id=\"16\">\r\n                      @( string.Join(\",\", DateTime.UtcNow, context.Deployment.ServiceName, context.RequestId, context.Request.IpAddress, context.Operation.Name) ) \r\n                  </log-to-eventhub>\r\n    <quota-by-key calls=\"40\" counter-key=\"cc\" renewal-period=\"3600\" increment-count=\"@(context.Request.Method == &quot;POST&quot; ? 1:2)\" />\r\n    <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n</policies>"
+    policy_id: policy
+    value: "<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>"
     format: xml
 - name: ApiManagementDeleteProductPolicy
   azure.rm.apimanagementproductpolicy:
     resource_group: myResourceGroup
     service_name: myService
-    product_id: myProduct
+    product_id: product
     policy_id: myPolicy
     state: absent
 
@@ -165,30 +153,30 @@ class AzureRMProductPolicy(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             product_id=dict(
                 type='str',
                 updatable=False,
                 disposition='productId',
-                required=true
+                required=True
             ),
             policy_id=dict(
                 type='str',
                 updatable=False,
                 disposition='policyId',
-                required=true
+                required=True
             ),
             value=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             format=dict(
                 type='str',
@@ -209,9 +197,6 @@ class AzureRMProductPolicy(AzureRMModuleBaseExt):
         self.service_name = None
         self.product_id = None
         self.policy_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -262,8 +247,8 @@ class AzureRMProductPolicy(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.product_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
+        self.url = self.url.replace('{{ policy_name }}', self.policy_id)
 
         old_response = self.get_resource()
 

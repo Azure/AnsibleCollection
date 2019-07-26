@@ -45,18 +45,6 @@ options:
         instance.
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the GroupUser.
@@ -148,6 +136,9 @@ EXAMPLES = '''
     service_name: myService
     group_id: myGroup
     user_id: myUser
+    first_name: test
+    last_name: user
+    gstate: active
 - name: ApiManagementDeleteGroupUser
   azure.rm.apimanagementgroupuser:
     resource_group: myResourceGroup
@@ -210,29 +201,29 @@ class AzureRMGroupUser(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             group_id=dict(
                 type='str',
                 updatable=False,
                 disposition='groupId',
-                required=true
+                required=True
             ),
             user_id=dict(
                 type='str',
                 updatable=False,
                 disposition='userId',
-                required=true
+                required=True
             ),
-            state=dict(
+            gstate=dict(
                 type='str',
-                disposition='/properties/*',
+                disposition='/properties/state',
                 choices=['active',
                          'blocked',
                          'pending',
@@ -277,7 +268,7 @@ class AzureRMGroupUser(AzureRMModuleBaseExt):
                     display_name=dict(
                         type='str',
                         disposition='displayName',
-                        required=true
+                        required=True
                     ),
                     description=dict(
                         type='str'
@@ -309,10 +300,6 @@ class AzureRMGroupUser(AzureRMModuleBaseExt):
         self.service_name = None
         self.group_id = None
         self.user_id = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -363,8 +350,8 @@ class AzureRMGroupUser(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ group_name }}', self.group_name)
-        self.url = self.url.replace('{{ user_name }}', self.name)
+        self.url = self.url.replace('{{ group_name }}', self.group_id)
+        self.url = self.url.replace('{{ user_name }}', self.user_id)
 
         old_response = self.get_resource()
 

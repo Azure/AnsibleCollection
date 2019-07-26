@@ -62,18 +62,6 @@ options:
     description:
       - Tag name.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ApiTagDescription.
@@ -190,25 +178,25 @@ class AzureRMApiTagDescription(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             tag_id=dict(
                 type='str',
                 updatable=False,
                 disposition='tagId',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -233,9 +221,6 @@ class AzureRMApiTagDescription(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.tag_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -286,8 +271,8 @@ class AzureRMApiTagDescription(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ tag_description_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ tag_description_name }}', self.tag_id)
 
         old_response = self.get_resource()
 

@@ -47,10 +47,6 @@ options:
     description:
       - Group description.
     type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   external_id:
     description:
       - >-
@@ -65,14 +61,6 @@ options:
         true if the group is one of the three system groups (Administrators,
         Developers, or Guests); otherwise false.
     type: boolean
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
   state:
     description:
       - Assert the state of the Group.
@@ -208,24 +196,24 @@ class AzureRMGroup(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             group_id=dict(
                 type='str',
                 updatable=False,
                 disposition='groupId',
-                required=true
+                required=True
             ),
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -252,9 +240,6 @@ class AzureRMGroup(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.group_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -303,7 +288,7 @@ class AzureRMGroup(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ group_name }}', self.name)
+        self.url = self.url.replace('{{ group_name }}', self.group_id)
 
         old_response = self.get_resource()
 

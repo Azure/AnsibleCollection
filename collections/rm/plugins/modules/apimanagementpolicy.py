@@ -45,18 +45,6 @@ options:
     description:
       - Format of the policyContent.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the Policy.
@@ -77,14 +65,14 @@ EXAMPLES = '''
   azure.rm.apimanagementpolicy:
     resource_group: myResourceGroup
     service_name: myService
-    policy_id: myPolicy
+    policy_id: policy
     value: "<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>"
     format: xml
 - name: ApiManagementDeletePolicy
   azure.rm.apimanagementpolicy:
     resource_group: myResourceGroup
     service_name: myService
-    policy_id: myPolicy
+    policy_id: policy
     state: absent
 
 '''
@@ -154,24 +142,24 @@ class AzureRMPolicy(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             policy_id=dict(
                 type='str',
                 updatable=False,
                 disposition='policyId',
-                required=true
+                required=True
             ),
             value=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             format=dict(
                 type='str',
@@ -191,9 +179,6 @@ class AzureRMPolicy(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.policy_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -242,7 +227,7 @@ class AzureRMPolicy(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ policy_name }}', self.policy_id)
 
         old_response = self.get_resource()
 

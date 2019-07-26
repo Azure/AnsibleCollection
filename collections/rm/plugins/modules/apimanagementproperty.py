@@ -41,7 +41,7 @@ options:
       - >-
         Determines whether the value is a secret and should be encrypted or not.
         Default value is false.
-    type: boolean
+    type: bool
   display_name:
     description:
       - >-
@@ -55,19 +55,7 @@ options:
         Value of the property. Can contain policy expressions. It may not be
         empty or consist only of whitespace.
     required: true
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
+    type: strs
   state:
     description:
       - Assert the state of the Property.
@@ -92,9 +80,6 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     prop_id: myProperty
-    tags:
-      - foo
-      - bar
     secret: true
     display_name: prop3name
     value: propValue
@@ -103,9 +88,6 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     prop_id: myProperty
-    tags:
-      - foo
-      - bar2
     secret: true
 - name: ApiManagementDeleteProperty
   azure.rm.apimanagementproperty:
@@ -148,7 +130,7 @@ properties:
           Optional tags that when provided can be used to filter the property
           list.
       returned: always
-      type: str
+      type: list
       sample: null
     secret:
       description:
@@ -156,7 +138,7 @@ properties:
           Determines whether the value is a secret and should be encrypted or
           not. Default value is false.
       returned: always
-      type: boolean
+      type: bool
       sample: null
     display_name:
       description:
@@ -201,33 +183,33 @@ class AzureRMProperty(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             prop_id=dict(
                 type='str',
                 updatable=False,
                 disposition='propId',
-                required=true
+                required=True
             ),
             secret=dict(
-                type='boolean',
+                type='bool',
                 disposition='/properties/*'
             ),
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             value=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -239,9 +221,6 @@ class AzureRMProperty(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.prop_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -290,7 +269,7 @@ class AzureRMProperty(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ property_name }}', self.name)
+        self.url = self.url.replace('{{ property_name }}', self.prop_id)
 
         old_response = self.get_resource()
 

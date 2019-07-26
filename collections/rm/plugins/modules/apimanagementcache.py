@@ -51,18 +51,6 @@ options:
     description:
       - Original uri of entity in external system cache points to
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the Cache.
@@ -89,12 +77,6 @@ EXAMPLES = '''
     resource_id: >-
       /subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group
       }}/providers/Microsoft.Cache/Redis/{{ redis_name }}
-- name: ApiManagementUpdateCache
-  azure.rm.apimanagementcache:
-    resource_group: myResourceGroup
-    service_name: myService
-    cache_id: myCache
-    description: Update Cache in west India
 - name: ApiManagementDeleteCache
   azure.rm.apimanagementcache:
     resource_group: myResourceGroup
@@ -175,19 +157,19 @@ class AzureRMCache(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             cache_id=dict(
                 type='str',
                 updatable=False,
                 disposition='cacheId',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -196,7 +178,7 @@ class AzureRMCache(AzureRMModuleBaseExt):
             connection_string=dict(
                 type='str',
                 disposition='/properties/connectionString',
-                required=true
+                required=True
             ),
             resource_id=dict(
                 type='raw',
@@ -214,9 +196,6 @@ class AzureRMCache(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.cache_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -265,7 +244,7 @@ class AzureRMCache(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ cache_name }}', self.name)
+        self.url = self.url.replace('{{ cache_name }}', self.cache_id)
 
         old_response = self.get_resource()
 

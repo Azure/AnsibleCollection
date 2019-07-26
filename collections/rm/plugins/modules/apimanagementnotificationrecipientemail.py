@@ -40,18 +40,6 @@ options:
     description:
       - User Email subscribed to notification.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the NotificationRecipientEmail.
@@ -74,13 +62,13 @@ EXAMPLES = '''
   azure.rm.apimanagementnotificationrecipientemail:
     resource_group: myResourceGroup
     service_name: myService
-    notification_name: myNotification
+    notification_name: RequestPublisherNotificationMessage
     email: myRecipientEmail
 - name: ApiManagementDeleteNotificationRecipientEmail
   azure.rm.apimanagementnotificationrecipientemail:
     resource_group: myResourceGroup
     service_name: myService
-    notification_name: myNotification
+    notification_name: RequestPublisherNotificationMessage
     email: myRecipientEmail
     state: absent
 
@@ -138,27 +126,24 @@ class AzureRMNotificationRecipientEmail(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             notification_name=dict(
                 type='str',
                 updatable=False,
                 disposition='notificationName',
-                required=true
+                required=True
             ),
             email=dict(
                 type='str',
                 updatable=False,
-                required=true
-            ),
-            email=dict(
-                type='str',
+                required=True,
                 disposition='/properties/*'
             ),
             state=dict(
@@ -171,10 +156,7 @@ class AzureRMNotificationRecipientEmail(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.notification_name = None
-        self.email = None
-        self.id = None
-        self.name = None
-        self.type = None
+        self.email_name = None
         self.properties = None
 
         self.results = dict(changed=False)
@@ -201,6 +183,7 @@ class AzureRMNotificationRecipientEmail(AzureRMModuleBaseExt):
             elif kwargs[key] is not None:
                 self.body[key] = kwargs[key]
 
+        self.email_name= self.body["email"]
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -227,7 +210,7 @@ class AzureRMNotificationRecipientEmail(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
         self.url = self.url.replace('{{ notification_name }}', self.notification_name)
-        self.url = self.url.replace('{{ recipient_email_name }}', self.name)
+        self.url = self.url.replace('{{ recipient_email_name }}', self.email_name)
 
         old_response = self.get_resource()
 

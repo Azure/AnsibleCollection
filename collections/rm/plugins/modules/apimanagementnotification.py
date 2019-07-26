@@ -31,22 +31,9 @@ options:
       - The name of the API Management service.
     required: true
     type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   title:
     description:
       - Title of the Notification.
-    required: true
     type: str
   description:
     description:
@@ -87,7 +74,8 @@ EXAMPLES = '''
   azure.rm.apimanagementnotification:
     resource_group: myResourceGroup
     service_name: myService
-    name: myNotification
+    name: RequestPublisherNotificationMessage
+    title: Subscription requests (requiring approval)
 
 '''
 
@@ -143,24 +131,23 @@ class AzureRMNotification(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             name=dict(
                 type='str',
                 updatable=False,
                 disposition='notificationName',
-                required=true
+                required=True
             ),
             title=dict(
                 type='str',
-                disposition='/properties/*',
-                required=true
+                disposition='/properties/*'
             ),
             description=dict(
                 type='str',
@@ -188,9 +175,6 @@ class AzureRMNotification(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.name = None
-        self.id = None
-        self.name = None
-        self.type = None
         self.properties = None
 
         self.results = dict(changed=False)

@@ -40,18 +40,6 @@ options:
     description:
       - API Management UserId subscribed to notification.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the NotificationRecipientUser.
@@ -74,14 +62,14 @@ EXAMPLES = '''
   azure.rm.apimanagementnotificationrecipientuser:
     resource_group: myResourceGroup
     service_name: myService
-    notification_name: myNotification
-    user_id: myRecipientUser
+    notification_name: RequestPublisherNotificationMessage
+    user_id: myUser
 - name: ApiManagementDeleteNotificationRecipientUser
   azure.rm.apimanagementnotificationrecipientuser:
     resource_group: myResourceGroup
     service_name: myService
-    notification_name: myNotification
-    user_id: myRecipientUser
+    notification_name: RequestPublisherNotificationMessage
+    user_id: myUser
     state: absent
 
 '''
@@ -138,28 +126,24 @@ class AzureRMNotificationRecipientUser(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             notification_name=dict(
                 type='str',
                 updatable=False,
                 disposition='notificationName',
-                required=true
+                required=True
             ),
             user_id=dict(
                 type='str',
                 updatable=False,
-                disposition='userId',
-                required=true
-            ),
-            user_id=dict(
-                type='str',
+                required=True,
                 disposition='/properties/userId'
             ),
             state=dict(
@@ -172,10 +156,7 @@ class AzureRMNotificationRecipientUser(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.notification_name = None
-        self.user_id = None
-        self.id = None
-        self.name = None
-        self.type = None
+        self.user_name = None
         self.properties = None
 
         self.results = dict(changed=False)
@@ -202,6 +183,7 @@ class AzureRMNotificationRecipientUser(AzureRMModuleBaseExt):
             elif kwargs[key] is not None:
                 self.body[key] = kwargs[key]
 
+        self.user_name=self.body["user_id"]
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -228,7 +210,7 @@ class AzureRMNotificationRecipientUser(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
         self.url = self.url.replace('{{ notification_name }}', self.notification_name)
-        self.url = self.url.replace('{{ recipient_user_name }}', self.name)
+        self.url = self.url.replace('{{ recipient_user_name }}', self.user_name)
 
         old_response = self.get_resource()
 
