@@ -66,18 +66,6 @@ options:
         in a HTTP request.
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ApiVersionSet.
@@ -102,7 +90,7 @@ EXAMPLES = '''
     service_name: myService
     version_set_id: myApiVersionSet
     description: Version configuration
-    display_name: api set 1
+    display_name: "api set 1"
     versioning_scheme: Segment
 - name: ApiManagementUpdateApiVersionSet
   azure.rm.apimanagementapiversionset:
@@ -110,7 +98,7 @@ EXAMPLES = '''
     service_name: myService
     version_set_id: myApiVersionSet
     description: Version configuration
-    display_name: api set 1
+    display_name: "api set 1"
     versioning_scheme: Segment
 - name: ApiManagementDeleteApiVersionSet
   azure.rm.apimanagementapiversionset:
@@ -210,19 +198,19 @@ class AzureRMApiVersionSet(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             version_set_id=dict(
                 type='str',
                 updatable=False,
                 disposition='versionSetId',
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -239,7 +227,7 @@ class AzureRMApiVersionSet(AzureRMModuleBaseExt):
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             versioning_scheme=dict(
                 type='str',
@@ -247,7 +235,7 @@ class AzureRMApiVersionSet(AzureRMModuleBaseExt):
                 choices=['Segment',
                          'Query',
                          'Header'],
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -259,9 +247,6 @@ class AzureRMApiVersionSet(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.version_set_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -310,7 +295,7 @@ class AzureRMApiVersionSet(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_version_set_name }}', self.name)
+        self.url = self.url.replace('{{ api_version_set_name }}', self.version_set_id)
 
         old_response = self.get_resource()
 

@@ -24,3 +24,19 @@
   apimanagementproperty
   apimanagementtag
   apimanagementuser
+# version 0.0.4:
+  apimanagementapidiagnostic
+  apimanagementapiissue
+  apimanagementapiissueattachment
+  apimanagementapiissuecomment
+  apimanagementapioperation
+  apimanagementapioperationpolicy
+  apimanagementapipolicy
+  apimanagementapirelease
+  apimanagementapiversionset
+  apimanagementauthorizationserver
+  apimanagementbackend
+  apimanagementdiagnostic 
+  apimanagementidentityprovider
+  apimanagementlogger
+  apimanagementsubscription

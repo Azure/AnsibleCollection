@@ -54,9 +54,7 @@ options:
         azureEventHub logger.<br>Instrumentation key for applicationInsights
         logger.
     required: true
-    type: >-
-      unknown[DictionaryType
-      {"$id":"3331","$type":"DictionaryType","valueType":{"$id":"3332","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"3333","fixed":false,"raw":"String"},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"3334","fixed":false},"deprecated":false}]
+    type: str
   is_buffered:
     description:
       - >-
@@ -68,18 +66,6 @@ options:
       - >-
         Azure Resource Id of a log target (either Azure Event Hub resource or
         Azure Application Insights resource).
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
     type: str
   state:
     description:
@@ -116,7 +102,7 @@ EXAMPLES = '''
     logger_type: applicationInsights
     description: adding a new logger
     credentials:
-      instrumentationKey: 11................a1
+      instrumentationKey: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 - name: ApiManagementUpdateLogger
   azure.rm.apimanagementlogger:
     resource_group: myResourceGroup
@@ -180,9 +166,7 @@ properties:
           azureEventHub logger.<br>Instrumentation key for applicationInsights
           logger.
       returned: always
-      type: >-
-        unknown[DictionaryType
-        {"$id":"3331","$type":"DictionaryType","valueType":{"$id":"3332","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"3333","fixed":false,"raw":"String"},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"3334","fixed":false},"deprecated":false}]
+      type: str
       sample: null
     is_buffered:
       description:
@@ -227,35 +211,35 @@ class AzureRMLogger(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             logger_id=dict(
                 type='str',
                 updatable=False,
                 disposition='loggerId',
-                required=true
+                required=True
             ),
             logger_type=dict(
                 type='str',
                 disposition='/properties/loggerType',
                 choices=['azureEventHub',
                          'applicationInsights'],
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
                 disposition='/properties/*'
             ),
             credentials=dict(
-                type='unknown[DictionaryType {"$id":"3331","$type":"DictionaryType","valueType":{"$id":"3332","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"3333","fixed":false,"raw":"String"},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"3334","fixed":false},"deprecated":false}]',
+                type='dict',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             is_buffered=dict(
                 type='boolean',
@@ -275,9 +259,6 @@ class AzureRMLogger(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.logger_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -298,11 +279,17 @@ class AzureRMLogger(AzureRMModuleBaseExt):
 
     def exec_module(self, **kwargs):
         for key in list(self.module_arg_spec.keys()):
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-            elif kwargs[key] is not None:
+            # if hasattr(self, key):
+                # setattr(self, key, kwargs[key])
+            # elif kwargs[key] is not None:
+                # self.body[key] = kwargs[key]
+            if kwargs[key] is not None and not hasattr(self, key):
                 self.body[key] = kwargs[key]
 
+        self.resource_group = kwargs['resource_group']
+        self.service_name = kwargs['service_name']
+        self.logger_id = kwargs['logger_id']
+        self.body['credentials'] = kwargs['credentials']
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -326,7 +313,7 @@ class AzureRMLogger(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ logger_name }}', self.name)
+        self.url = self.url.replace('{{ logger_name }}', self.logger_id)
 
         old_response = self.get_resource()
 

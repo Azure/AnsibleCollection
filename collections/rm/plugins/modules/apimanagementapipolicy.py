@@ -88,10 +88,8 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     api_id: myApi
-    policy_id: myPolicy
-    value: >-
-      <policies> <inbound /> <backend>    <forward-request />  </backend> 
-      <outbound /></policies>
+    policy_id: policy
+    value: "<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>"
     format: xml
 - name: ApiManagementCreateApiPolicyNonXmlEncoded
   azure.rm.apimanagementapipolicy:
@@ -176,30 +174,30 @@ class AzureRMApiPolicy(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             policy_id=dict(
                 type='str',
                 updatable=False,
                 disposition='policyId',
-                required=true
+                required=True
             ),
             value=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             format=dict(
                 type='str',
@@ -220,9 +218,6 @@ class AzureRMApiPolicy(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.policy_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -273,8 +268,8 @@ class AzureRMApiPolicy(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ policy_name }}', self.policy_id)
 
         old_response = self.get_resource()
 

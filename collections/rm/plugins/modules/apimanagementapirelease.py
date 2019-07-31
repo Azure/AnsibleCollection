@@ -51,22 +51,10 @@ options:
       - >-
         The time the API was released. The date conforms to the following
         format: yyyy-MM-ddTHH:mm:ssZ as specified by the ISO 8601 standard.
-    type: datetime
+    type: str
   updated_date_time:
     description:
       - The time the API release was updated.
-    type: datetime
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
     type: str
   state:
     description:
@@ -90,17 +78,8 @@ EXAMPLES = '''
   azure.rm.apimanagementapirelease:
     resource_group: myResourceGroup
     service_name: myService
-    api_id: >-
-      /subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group
-      }}/providers/Microsoft.ApiManagement/service/{{ service_name }}/apis/{{
-      api_name }}
-    release_id: myRelease
-    notes: yahooagain
-- name: ApiManagementUpdateApiRelease
-  azure.rm.apimanagementapirelease:
-    resource_group: myResourceGroup
-    service_name: myService
-    api_id: >-
+    api_id: myApi
+    papi_id: >-
       /subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group
       }}/providers/Microsoft.ApiManagement/service/{{ service_name }}/apis/{{
       api_name }}
@@ -154,13 +133,13 @@ properties:
           The time the API was released. The date conforms to the following
           format: yyyy-MM-ddTHH:mm:ssZ as specified by the ISO 8601 standard.
       returned: always
-      type: datetime
+      type: str
       sample: null
     updated_date_time:
       description:
         - The time the API release was updated.
       returned: always
-      type: datetime
+      type: str
       sample: null
     notes:
       description:
@@ -195,32 +174,29 @@ class AzureRMApiRelease(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             release_id=dict(
                 type='str',
                 updatable=False,
                 disposition='releaseId',
-                required=true
+                required=True
             ),
-            api_id=dict(
-                type='raw',
-                disposition='/properties/apiId',
-                pattern=('//subscriptions/{{ subscription_id }}/resourceGroups'
-                         '/{{ resource_group }}/providers/Microsoft.ApiManagement/service'
-                         '/{{ service_name }}/apis/{{ name }}')
+            papi_id=dict(
+                type='str',
+                disposition='/properties/apiId'
             ),
             notes=dict(
                 type='str',
@@ -237,9 +213,6 @@ class AzureRMApiRelease(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.release_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -290,8 +263,8 @@ class AzureRMApiRelease(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ release_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ release_name }}', self.release_id)
 
         old_response = self.get_resource()
 

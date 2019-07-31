@@ -45,7 +45,7 @@ options:
   created_date:
     description:
       - Date and time when the issue was created.
-    type: datetime
+    type: str
   state:
     description:
       - Assert the state of the ApiIssue.
@@ -59,29 +59,14 @@ options:
   title:
     description:
       - The issue title.
-    required: true
     type: str
   description:
     description:
       - Text describing the issue.
-    required: true
     type: str
   user_id:
     description:
       - A resource identifier for the user created the issue.
-    required: true
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
     type: str
 extends_documentation_fragment:
   - azure
@@ -98,9 +83,13 @@ EXAMPLES = '''
     api_id: myApi
     issue_id: myIssue
     created_date: '2018-02-01T22:21:20.467Z'
-    state: open
+    pstate: open
     title: New API issue
     description: New API issue description
+    papi_id: >-
+      /subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group
+      }}/providers/Microsoft.ApiManagement/service/{{ service_name }}/apis/{{
+      api_name}}
     user_id: >-
       /subscriptions/{{ subscription_id }}/resourceGroups/{{ resource_group
       }}/providers/Microsoft.ApiManagement/service/{{ service_name }}/users/{{
@@ -111,7 +100,7 @@ EXAMPLES = '''
     service_name: myService
     api_id: myApi
     issue_id: myIssue
-    state: closed
+    pstate: closed
 - name: ApiManagementDeleteApiIssue
   azure.rm.apimanagementapiissue:
     resource_group: myResourceGroup
@@ -152,7 +141,7 @@ properties:
       description:
         - Date and time when the issue was created.
       returned: always
-      type: datetime
+      type: str
       sample: null
     state:
       description:
@@ -211,60 +200,54 @@ class AzureRMApiIssue(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             issue_id=dict(
                 type='str',
                 updatable=False,
                 disposition='issueId',
-                required=true
+                required=True
             ),
             created_date=dict(
-                type='datetime',
+                type='str',
                 disposition='/properties/createdDate'
             ),
-            state=dict(
+            pstate=dict(
                 type='str',
-                disposition='/properties/*',
+                disposition='/properties/state',
                 choices=['proposed',
                          'open',
                          'removed',
                          'resolved',
                          'closed']
             ),
-            api_id=dict(
+            papi_id=dict(
                 type='str',
                 disposition='/properties/apiId'
             ),
             title=dict(
                 type='str',
-                disposition='/properties/*',
-                required=true
+                disposition='/properties/*'
             ),
             description=dict(
                 type='str',
-                disposition='/properties/*',
-                required=true
+                disposition='/properties/*'
             ),
             user_id=dict(
-                type='raw',
-                disposition='/properties/userId',
-                required=true,
-                pattern=('//subscriptions/{{ subscription_id }}/resourceGroups'
-                         '/{{ resource_group }}/providers/Microsoft.ApiManagement/service'
-                         '/{{ service_name }}/users/{{ name }}')
+                type='str',
+                disposition='/properties/userId'
             ),
             state=dict(
                 type='str',
@@ -277,9 +260,6 @@ class AzureRMApiIssue(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.issue_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -305,6 +285,8 @@ class AzureRMApiIssue(AzureRMModuleBaseExt):
             elif kwargs[key] is not None:
                 self.body[key] = kwargs[key]
 
+        self.api_id =  kwargs['api_id']
+        self.body['user_id'] = kwargs['user_id']
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -330,8 +312,8 @@ class AzureRMApiIssue(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ issue_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ issue_name }}', self.issue_id)
 
         old_response = self.get_resource()
 

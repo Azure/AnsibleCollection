@@ -85,7 +85,7 @@ options:
         If true, authorization server will include state parameter from the
         authorization request to its response. Client may use state parameter to
         raise protocol security.
-    type: boolean
+    type: bool
   default_scope:
     description:
       - >-
@@ -305,7 +305,7 @@ properties:
           authorization request to its response. Client may use state parameter
           to raise protocol security.
       returned: always
-      type: boolean
+      type: bool
       sample: null
     default_scope:
       description:
@@ -410,18 +410,18 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             authsid=dict(
                 type='str',
                 updatable=False,
-                required=true
+                required=True
             ),
             description=dict(
                 type='str',
@@ -451,11 +451,11 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
                 options=dict(
                     name=dict(
                         type='str',
-                        required=true
+                        required=True
                     ),
                     value=dict(
                         type='str',
-                        required=true
+                        required=True
                     )
                 )
             ),
@@ -464,7 +464,7 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
                 disposition='/properties/tokenEndpoint'
             ),
             support_state=dict(
-                type='boolean',
+                type='bool',
                 disposition='/properties/supportState'
             ),
             default_scope=dict(
@@ -492,17 +492,17 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             client_registration_endpoint=dict(
                 type='str',
                 disposition='/properties/clientRegistrationEndpoint',
-                required=true
+                required=True
             ),
             authorization_endpoint=dict(
                 type='str',
                 disposition='/properties/authorizationEndpoint',
-                required=true
+                required=True
             ),
             grant_types=dict(
                 type='list',
@@ -511,12 +511,12 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
                          'implicit',
                          'resourceOwnerPassword',
                          'clientCredentials'],
-                required=true
+                required=True
             ),
             client_id=dict(
                 type='str',
                 disposition='/properties/clientId',
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -528,9 +528,6 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.authsid = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -579,7 +576,7 @@ class AzureRMAuthorizationServer(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ authorization_server_name }}', self.name)
+        self.url = self.url.replace('{{ authorization_server_name }}', self.authsid)
 
         old_response = self.get_resource()
 

@@ -66,7 +66,7 @@ options:
       percentage:
         description:
           - Rate of sampling for fixed-rate sampling.
-        type: number
+        type: int
   frontend:
     description:
       - Diagnostic settings for incoming/outgoing HTTP messages to the Gateway.
@@ -89,7 +89,7 @@ options:
               bytes:
                 description:
                   - Number of request body bytes to log.
-                type: number
+                type: int
       response:
         description:
           - Diagnostic settings for response.
@@ -107,7 +107,7 @@ options:
               bytes:
                 description:
                   - Number of request body bytes to log.
-                type: number
+                type: int
   backend:
     description:
       - Diagnostic settings for incoming/outgoing HTTP messages to the Backend
@@ -130,7 +130,7 @@ options:
               bytes:
                 description:
                   - Number of request body bytes to log.
-                type: number
+                type: int
       response:
         description:
           - Diagnostic settings for response.
@@ -148,25 +148,13 @@ options:
               bytes:
                 description:
                   - Number of request body bytes to log.
-                type: number
+                type: int
   enable_http_correlation_headers:
     description:
       - >-
         Whether to process Correlation Headers coming to Api Management Service.
         Only applicable to Application Insights diagnostics. Default is true.
     type: boolean
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ApiDiagnostic.
@@ -190,7 +178,7 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     api_id: myApi
-    diagnostic_id: myDiagnostic
+    diagnostic_id: applicationinsights
     always_log: allErrors
     logger_id: /loggers/applicationinsights
     sampling:
@@ -318,7 +306,7 @@ properties:
           description:
             - Rate of sampling for fixed-rate sampling.
           returned: always
-          type: number
+          type: int
           sample: null
     frontend:
       description:
@@ -353,7 +341,7 @@ properties:
                   description:
                     - Number of request body bytes to log.
                   returned: always
-                  type: number
+                  type: int
                   sample: null
         response:
           description:
@@ -379,7 +367,7 @@ properties:
                   description:
                     - Number of request body bytes to log.
                   returned: always
-                  type: number
+                  type: int
                   sample: null
     backend:
       description:
@@ -412,7 +400,7 @@ properties:
                   description:
                     - Number of request body bytes to log.
                   returned: always
-                  type: number
+                  type: int
                   sample: null
         response:
           description:
@@ -438,7 +426,7 @@ properties:
                   description:
                     - Number of request body bytes to log.
                   returned: always
-                  type: number
+                  type: int
                   sample: null
     enable_http_correlation_headers:
       description:
@@ -476,25 +464,25 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             diagnostic_id=dict(
                 type='str',
                 updatable=False,
                 disposition='diagnosticId',
-                required=true
+                required=True
             ),
             always_log=dict(
                 type='str',
@@ -504,7 +492,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
             logger_id=dict(
                 type='str',
                 disposition='/properties/loggerId',
-                required=true
+                required=True
             ),
             sampling=dict(
                 type='dict',
@@ -516,7 +504,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                         choices=['fixed']
                     ),
                     percentage=dict(
-                        type='number'
+                        type='int'
                     )
                 )
             ),
@@ -534,7 +522,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                                 type='dict',
                                 options=dict(
                                     bytes=dict(
-                                        type='number'
+                                        type='int'
                                     )
                                 )
                             )
@@ -550,7 +538,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                                 type='dict',
                                 options=dict(
                                     bytes=dict(
-                                        type='number'
+                                        type='int'
                                     )
                                 )
                             )
@@ -572,7 +560,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                                 type='dict',
                                 options=dict(
                                     bytes=dict(
-                                        type='number'
+                                        type='int'
                                     )
                                 )
                             )
@@ -588,7 +576,7 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
                                 type='dict',
                                 options=dict(
                                     bytes=dict(
-                                        type='number'
+                                        type='int'
                                     )
                                 )
                             )
@@ -611,9 +599,6 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.diagnostic_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -664,8 +649,8 @@ class AzureRMApiDiagnostic(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ diagnostic_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ diagnostic_name }}', self.diagnostic_id)
 
         old_response = self.get_resource()
 

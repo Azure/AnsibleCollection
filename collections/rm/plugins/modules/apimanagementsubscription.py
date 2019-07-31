@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*- 
 #
 # Copyright (c) 2019 Zim Kalinowski, (@zikalino)
 #
@@ -131,18 +132,6 @@ options:
         email notification for change of state of subscription <br> - If true,
         send email notification of change of state of subscription 
     type: boolean
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
 extends_documentation_fragment:
   - azure
 author:
@@ -342,38 +331,31 @@ class AzureRMSubscription(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             sid=dict(
                 type='str',
                 updatable=False,
-                required=true
+                required=True
             ),
             owner_id=dict(
-                type='raw',
-                disposition='/properties/ownerId',
-                pattern=('//subscriptions/{{ subscription_id }}/resourceGroups'
-                         '/{{ resource_group }}/providers/Microsoft.ApiManagement/service'
-                         '/{{ service_name }}/users/{{ name }}')
+                type='str',
+                disposition='/properties/ownerId'
             ),
             scope=dict(
-                type='raw',
-                disposition='/properties/*',
-                required=true,
-                pattern=('//subscriptions/{{ subscription_id }}/resourceGroups'
-                         '/{{ resource_group }}/providers/Microsoft.ApiManagement/service'
-                         '/{{ service_name }}/products/{{ name }}')
+                type='str',
+                disposition='/properties/*'
             ),
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             primary_key=dict(
                 type='str',
@@ -383,7 +365,7 @@ class AzureRMSubscription(AzureRMModuleBaseExt):
                 type='str',
                 disposition='/properties/secondaryKey'
             ),
-            state=dict(
+            pstate=dict(
                 type='str',
                 disposition='/properties/*',
                 choices=['suspended',
@@ -411,10 +393,6 @@ class AzureRMSubscription(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.sid = None
-        self.notify = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -440,6 +418,7 @@ class AzureRMSubscription(AzureRMModuleBaseExt):
             elif kwargs[key] is not None:
                 self.body[key] = kwargs[key]
 
+        self.body['scope'] = kwargs['scope']
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -463,7 +442,7 @@ class AzureRMSubscription(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
+        self.url = self.url.replace('{{ subscription_id }}', self.sid)
 
         old_response = self.get_resource()
 

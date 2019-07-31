@@ -53,28 +53,14 @@ options:
   text:
     description:
       - Comment text.
-    required: true
     type: str
   created_date:
     description:
       - Date and time when the comment was created.
-    type: datetime
+    type: str
   user_id:
     description:
       - A resource identifier for the user who left the comment.
-    required: true
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
     type: str
   state:
     description:
@@ -154,7 +140,7 @@ properties:
       description:
         - Date and time when the comment was created.
       returned: always
-      type: datetime
+      type: str
       sample: null
     user_id:
       description:
@@ -189,48 +175,43 @@ class AzureRMApiIssueComment(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             issue_id=dict(
                 type='str',
                 updatable=False,
                 disposition='issueId',
-                required=true
+                required=True
             ),
             comment_id=dict(
                 type='str',
                 updatable=False,
                 disposition='commentId',
-                required=true
+                required=True
             ),
             text=dict(
                 type='str',
-                disposition='/properties/*',
-                required=true
+                disposition='/properties/*'
             ),
             created_date=dict(
-                type='datetime',
+                type='str',
                 disposition='/properties/createdDate'
             ),
             user_id=dict(
                 type='raw',
-                disposition='/properties/userId',
-                required=true,
-                pattern=('//subscriptions/{{ subscription_id }}/resourceGroups'
-                         '/{{ resource_group }}/providers/Microsoft.ApiManagement/service'
-                         '/{{ service_name }}/users/{{ name }}')
+                disposition='/properties/userId'
             ),
             state=dict(
                 type='str',
@@ -244,9 +225,6 @@ class AzureRMApiIssueComment(AzureRMModuleBaseExt):
         self.api_id = None
         self.issue_id = None
         self.comment_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -272,6 +250,7 @@ class AzureRMApiIssueComment(AzureRMModuleBaseExt):
             elif kwargs[key] is not None:
                 self.body[key] = kwargs[key]
 
+        self.body['user_id'] = kwargs['user_id']
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -299,9 +278,9 @@ class AzureRMApiIssueComment(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ issue_name }}', self.issue_name)
-        self.url = self.url.replace('{{ comment_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ issue_name }}', self.issue_id)
+        self.url = self.url.replace('{{ comment_name }}', self.comment_id)
 
         old_response = self.get_resource()
 

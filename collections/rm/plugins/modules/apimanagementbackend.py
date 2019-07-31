@@ -65,7 +65,7 @@ options:
       max_partition_resolution_retries:
         description:
           - Maximum number of retries while attempting resolve the partition.
-        type: number
+        type: str
       management_endpoints:
         description:
           - The cluster management endpoint.
@@ -157,13 +157,13 @@ options:
           - >-
             Flag indicating whether SSL certificate chain validation should be
             done when using self-signed certificates for this backend host.
-        type: boolean
+        type: bool
       validate_certificate_name:
         description:
           - >-
             Flag indicating whether SSL certificate name validation should be
             done when using self-signed certificates for this backend host.
-        type: boolean
+        type: bool
   url:
     description:
       - Runtime Url of the Backend.
@@ -173,18 +173,6 @@ options:
     description:
       - Backend communication protocol.
     required: true
-    type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
     type: str
   state:
     description:
@@ -209,7 +197,7 @@ EXAMPLES = '''
     resource_group: myResourceGroup
     service_name: myService
     backend_id: myBackend
-    description: Service Fabric Test App 1
+    description: "Service Fabric Test App 1"
     service_fabric_cluster:
       client_certificatethumbprint: EBA029198AA3E76EF0D70482626E5BCF148594A6
       max_partition_resolution_retries: '5'
@@ -338,7 +326,7 @@ properties:
                   Maximum number of retries while attempting resolve the
                   partition.
               returned: always
-              type: number
+              type: str
               sample: null
             management_endpoints:
               description:
@@ -390,17 +378,13 @@ properties:
           description:
             - Query Parameter description.
           returned: always
-          type: >-
-            unknown[DictionaryType
-            {"$id":"1845","$type":"DictionaryType","valueType":{"$id":"1846","$type":"SequenceType","elementType":{"$id":"1847","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"1848","fixed":false,"raw":"String"},"deprecated":false},"name":{"$id":"1849","fixed":false},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"1850","fixed":false},"deprecated":false}]
+          type: str
           sample: null
         header:
           description:
             - Header Parameter description.
           returned: always
-          type: >-
-            unknown[DictionaryType
-            {"$id":"1855","$type":"DictionaryType","valueType":{"$id":"1856","$type":"SequenceType","elementType":{"$id":"1857","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"1858","fixed":false,"raw":"String"},"deprecated":false},"name":{"$id":"1859","fixed":false},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"1860","fixed":false},"deprecated":false}]
+          type: str
           sample: null
         authorization:
           description:
@@ -462,7 +446,7 @@ properties:
               Flag indicating whether SSL certificate chain validation should be
               done when using self-signed certificates for this backend host.
           returned: always
-          type: boolean
+          type: bool
           sample: null
         validate_certificate_name:
           description:
@@ -470,7 +454,7 @@ properties:
               Flag indicating whether SSL certificate name validation should be
               done when using self-signed certificates for this backend host.
           returned: always
-          type: boolean
+          type: bool
           sample: null
     url:
       description:
@@ -511,19 +495,19 @@ class AzureRMBackend(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             backend_id=dict(
                 type='str',
                 updatable=False,
                 disposition='backendId',
-                required=true
+                required=True
             ),
             title=dict(
                 type='str',
@@ -544,16 +528,16 @@ class AzureRMBackend(AzureRMModuleBaseExt):
                     client_certificatethumbprint=dict(
                         type='str',
                         disposition='clientCertificatethumbprint',
-                        required=true
+                        required=True
                     ),
                     max_partition_resolution_retries=dict(
-                        type='number',
+                        type='str',
                         disposition='maxPartitionResolutionRetries'
                     ),
                     management_endpoints=dict(
                         type='list',
                         disposition='managementEndpoints',
-                        required=true
+                        required=True
                     ),
                     server_certificate_thumbprints=dict(
                         type='list',
@@ -582,21 +566,21 @@ class AzureRMBackend(AzureRMModuleBaseExt):
                         type='list'
                     ),
                     query=dict(
-                        type='unknown[DictionaryType {"$id":"1845","$type":"DictionaryType","valueType":{"$id":"1846","$type":"SequenceType","elementType":{"$id":"1847","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"1848","fixed":false,"raw":"String"},"deprecated":false},"name":{"$id":"1849","fixed":false},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"1850","fixed":false},"deprecated":false}]'
+                        type='dict'
                     ),
                     header=dict(
-                        type='unknown[DictionaryType {"$id":"1855","$type":"DictionaryType","valueType":{"$id":"1856","$type":"SequenceType","elementType":{"$id":"1857","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"1858","fixed":false,"raw":"String"},"deprecated":false},"name":{"$id":"1859","fixed":false},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"1860","fixed":false},"deprecated":false}]'
+                        type='dict'
                     ),
                     authorization=dict(
                         type='dict',
                         options=dict(
                             scheme=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             parameter=dict(
                                 type='str',
-                                required=true
+                                required=True
                             )
                         )
                     )
@@ -608,7 +592,7 @@ class AzureRMBackend(AzureRMModuleBaseExt):
                 options=dict(
                     url=dict(
                         type='str',
-                        required=true
+                        required=True
                     ),
                     username=dict(
                         type='str'
@@ -624,11 +608,11 @@ class AzureRMBackend(AzureRMModuleBaseExt):
                 disposition='/properties/*',
                 options=dict(
                     validate_certificate_chain=dict(
-                        type='boolean',
+                        type='bool',
                         disposition='validateCertificateChain'
                     ),
                     validate_certificate_name=dict(
-                        type='boolean',
+                        type='bool',
                         disposition='validateCertificateName'
                     )
                 )
@@ -636,14 +620,14 @@ class AzureRMBackend(AzureRMModuleBaseExt):
             url=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             protocol=dict(
                 type='str',
                 disposition='/properties/*',
                 choices=['http',
                          'soap'],
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -655,9 +639,6 @@ class AzureRMBackend(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.backend_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -678,11 +659,17 @@ class AzureRMBackend(AzureRMModuleBaseExt):
 
     def exec_module(self, **kwargs):
         for key in list(self.module_arg_spec.keys()):
-            if hasattr(self, key):
-                setattr(self, key, kwargs[key])
-            elif kwargs[key] is not None:
+            # if hasattr(self, key):
+                # setattr(self, key, kwargs[key])
+            # elif kwargs[key] is not None:
+                # self.body[key] = kwargs[key]
+            if kwargs[key] is not None and not hasattr(self, key):
                 self.body[key] = kwargs[key]
 
+        self.resource_group = kwargs['resource_group']
+        self.service_name = kwargs['service_name']
+        self.backend_id = kwargs['backend_id']
+        self.body['url'] = kwargs['url']
         self.inflate_parameters(self.module_arg_spec, self.body, 0)
 
         old_response = None
@@ -706,7 +693,7 @@ class AzureRMBackend(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ backend_name }}', self.name)
+        self.url = self.url.replace('{{ backend_name }}', self.backend_id)
 
         old_response = self.get_resource()
 

@@ -105,21 +105,21 @@ EXAMPLES = '''
   azure.rm.apimanagementidentityprovider:
     resource_group: myResourceGroup
     service_name: myService
-    name: myIdentityProvider
+    name: microsoft
     client_id: facebookid
     client_secret: facebookapplicationsecret
 - name: ApiManagementUpdateIdentityProvider
   azure.rm.apimanagementidentityprovider:
     resource_group: myResourceGroup
     service_name: myService
-    name: myIdentityProvider
+    name: microsoft
     client_id: updatedfacebookid
     client_secret: updatedfacebooksecret
 - name: ApiManagementDeleteIdentityProvider
   azure.rm.apimanagementidentityprovider:
     resource_group: myResourceGroup
     service_name: myService
-    name: myIdentityProvider
+    name: microsoft
     state: absent
 
 '''
@@ -239,19 +239,19 @@ class AzureRMIdentityProvider(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             name=dict(
                 type='str',
                 updatable=False,
                 disposition='identityProviderName',
-                required=true
+                required=True
             ),
             type=dict(
                 type='str',
@@ -291,12 +291,12 @@ class AzureRMIdentityProvider(AzureRMModuleBaseExt):
             client_id=dict(
                 type='str',
                 disposition='/properties/clientId',
-                required=true
+                required=True
             ),
             client_secret=dict(
                 type='str',
                 disposition='/properties/clientSecret',
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -308,10 +308,7 @@ class AzureRMIdentityProvider(AzureRMModuleBaseExt):
         self.resource_group = None
         self.service_name = None
         self.name = None
-        self.id = None
-        self.name = None
-        self.type = None
-
+        
         self.results = dict(changed=False)
         self.mgmt_client = None
         self.state = None

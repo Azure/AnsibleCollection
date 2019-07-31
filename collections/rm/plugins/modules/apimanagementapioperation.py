@@ -349,18 +349,6 @@ options:
         /customers/{cid}/orders/{oid}/?date={date}
     required: true
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ApiOperation.
@@ -907,25 +895,25 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             operation_id=dict(
                 type='str',
                 updatable=False,
                 disposition='operationId',
-                required=true
+                required=True
             ),
             template_parameters=dict(
                 type='list',
@@ -933,14 +921,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                 options=dict(
                     name=dict(
                         type='str',
-                        required=true
+                        required=True
                     ),
                     description=dict(
                         type='str'
                     ),
                     type=dict(
                         type='str',
-                        required=true
+                        required=True
                     ),
                     default_value=dict(
                         type='str',
@@ -971,14 +959,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                         options=dict(
                             name=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             description=dict(
                                 type='str'
                             ),
                             type=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             default_value=dict(
                                 type='str',
@@ -997,14 +985,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                         options=dict(
                             name=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             description=dict(
                                 type='str'
                             ),
                             type=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             default_value=dict(
                                 type='str',
@@ -1024,7 +1012,7 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                             content_type=dict(
                                 type='str',
                                 disposition='contentType',
-                                required=true
+                                required=True
                             ),
                             sample=dict(
                                 type='str'
@@ -1043,14 +1031,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                                 options=dict(
                                     name=dict(
                                         type='str',
-                                        required=true
+                                        required=True
                                     ),
                                     description=dict(
                                         type='str'
                                     ),
                                     type=dict(
                                         type='str',
-                                        required=true
+                                        required=True
                                     ),
                                     default_value=dict(
                                         type='str',
@@ -1075,7 +1063,7 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                     status_code=dict(
                         type='number',
                         disposition='statusCode',
-                        required=true
+                        required=True
                     ),
                     description=dict(
                         type='str'
@@ -1086,7 +1074,7 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                             content_type=dict(
                                 type='str',
                                 disposition='contentType',
-                                required=true
+                                required=True
                             ),
                             sample=dict(
                                 type='str'
@@ -1105,14 +1093,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                                 options=dict(
                                     name=dict(
                                         type='str',
-                                        required=true
+                                        required=True
                                     ),
                                     description=dict(
                                         type='str'
                                     ),
                                     type=dict(
                                         type='str',
-                                        required=true
+                                        required=True
                                     ),
                                     default_value=dict(
                                         type='str',
@@ -1133,14 +1121,14 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
                         options=dict(
                             name=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             description=dict(
                                 type='str'
                             ),
                             type=dict(
                                 type='str',
-                                required=true
+                                required=True
                             ),
                             default_value=dict(
                                 type='str',
@@ -1163,17 +1151,17 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
             display_name=dict(
                 type='str',
                 disposition='/properties/displayName',
-                required=true
+                required=True
             ),
             method=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             url_template=dict(
                 type='str',
                 disposition='/properties/urlTemplate',
-                required=true
+                required=True
             ),
             state=dict(
                 type='str',
@@ -1186,9 +1174,6 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
         self.service_name = None
         self.api_id = None
         self.operation_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -1239,8 +1224,8 @@ class AzureRMApiOperation(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ operation_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ operation_name }}', self.operation_id)
 
         old_response = self.get_resource()
 

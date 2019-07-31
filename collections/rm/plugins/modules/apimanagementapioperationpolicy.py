@@ -60,18 +60,6 @@ options:
     description:
       - Format of the policyContent.
     type: str
-  id:
-    description:
-      - Resource ID.
-    type: str
-  name:
-    description:
-      - Resource name.
-    type: str
-  type:
-    description:
-      - Resource type for API Management resource.
-    type: str
   state:
     description:
       - Assert the state of the ApiOperationPolicy.
@@ -96,10 +84,8 @@ EXAMPLES = '''
     service_name: myService
     api_id: myApi
     operation_id: myOperation
-    policy_id: myPolicy
-    value: >-
-      <policies> <inbound /> <backend>    <forward-request />  </backend> 
-      <outbound /></policies>
+    policy_id: policy
+    value: "<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>"
     format: xml
 - name: ApiManagementDeleteApiOperationPolicy
   azure.rm.apimanagementapioperationpolicy:
@@ -177,36 +163,36 @@ class AzureRMApiOperationPolicy(AzureRMModuleBaseExt):
                 type='str',
                 updatable=False,
                 disposition='resourceGroupName',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
                 updatable=False,
                 disposition='serviceName',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
                 updatable=False,
                 disposition='apiId',
-                required=true
+                required=True
             ),
             operation_id=dict(
                 type='str',
                 updatable=False,
                 disposition='operationId',
-                required=true
+                required=True
             ),
             policy_id=dict(
                 type='str',
                 updatable=False,
                 disposition='policyId',
-                required=true
+                required=True
             ),
             value=dict(
                 type='str',
                 disposition='/properties/*',
-                required=true
+                required=True
             ),
             format=dict(
                 type='str',
@@ -228,9 +214,6 @@ class AzureRMApiOperationPolicy(AzureRMModuleBaseExt):
         self.api_id = None
         self.operation_id = None
         self.policy_id = None
-        self.id = None
-        self.name = None
-        self.type = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -283,9 +266,9 @@ class AzureRMApiOperationPolicy(AzureRMModuleBaseExt):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ operation_name }}', self.operation_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ operation_name }}', self.operation_id)
+        self.url = self.url.replace('{{ policy_name }}', self.policy_id)
 
         old_response = self.get_resource()
 
