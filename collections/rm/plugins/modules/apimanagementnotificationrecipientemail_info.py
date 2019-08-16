@@ -70,7 +70,7 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListNotificationRecipientEmails
-  azure.rm.apimanagementnotificationrecipientemail.info:
+  azure.rm.apimanagementnotificationrecipientemail_info:
     resource_group: myResourceGroup
     service_name: myService
     name: myNotification
@@ -141,7 +141,11 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 
 class AzureRMNotificationRecipientEmailInfo(AzureRMModuleBase):
@@ -149,15 +153,15 @@ class AzureRMNotificationRecipientEmailInfo(AzureRMModuleBase):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             name=dict(
                 type='str',
-                required=true
+                required=True
             )
         )
 
@@ -192,7 +196,7 @@ class AzureRMNotificationRecipientEmailInfo(AzureRMModuleBase):
         if (self.resource_group is not None and
             self.service_name is not None and
             self.name is not None):
-            self.results['notification_recipient_email'] = self.format_item(self.listbynotification())
+            self.results['notification_recipient_email'] = self.listbynotification()
         return self.results
 
     def listbynotification(self):
@@ -224,15 +228,21 @@ class AzureRMNotificationRecipientEmailInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

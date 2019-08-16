@@ -72,12 +72,12 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListProductPolicies
-  azure.rm.apimanagementproductpolicy.info:
+  azure.rm.apimanagementproductpolicy_info:
     resource_group: myResourceGroup
     service_name: myService
     product_id: myProduct
 - name: ApiManagementGetProductPolicy
-  azure.rm.apimanagementproductpolicy.info:
+  azure.rm.apimanagementproductpolicy_info:
     resource_group: myResourceGroup
     service_name: myService
     product_id: myProduct
@@ -129,7 +129,11 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 
 class AzureRMProductPolicyInfo(AzureRMModuleBase):
@@ -137,15 +141,15 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             product_id=dict(
                 type='str',
-                required=true
+                required=True
             ),
             policy_id=dict(
                 type='str'
@@ -160,10 +164,6 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
         self.product_id = None
         self.policy_id = None
         self.format = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -191,11 +191,11 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
             self.service_name is not None and
             self.product_id is not None and
             self.policy_id is not None):
-            self.results['product_policy'] = self.format_item(self.get())
+            self.results['product_policy'] = self.get()
         elif (self.resource_group is not None and
               self.service_name is not None and
               self.product_id is not None):
-            self.results['product_policy'] = self.format_item(self.listbyproduct())
+            self.results['product_policy'] = self.listbyproduct()
         return self.results
 
     def get(self):
@@ -217,8 +217,8 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.product_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
+        self.url = self.url.replace('{{ policy_name }}', self.policy_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -229,12 +229,12 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
 
     def listbyproduct(self):
         response = None
@@ -254,8 +254,7 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.product_name)
-        self.url = self.url.replace('{{ policy_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -266,15 +265,21 @@ class AzureRMProductPolicyInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

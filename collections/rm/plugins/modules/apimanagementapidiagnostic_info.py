@@ -175,12 +175,12 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListApiDiagnostics
-  azure.rm.apimanagementapidiagnostic.info:
+  azure.rm.apimanagementapidiagnostic_info:
     resource_group: myResourceGroup
     service_name: myService
     api_id: myApi
 - name: ApiManagementGetApiDiagnostic
-  azure.rm.apimanagementapidiagnostic.info:
+  azure.rm.apimanagementapidiagnostic_info:
     resource_group: myResourceGroup
     service_name: myService
     api_id: myApi
@@ -232,7 +232,11 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 
 class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
@@ -240,15 +244,15 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             api_id=dict(
                 type='str',
-                required=true
+                required=True
             ),
             diagnostic_id=dict(
                 type='str'
@@ -259,10 +263,6 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
         self.service_name = None
         self.api_id = None
         self.diagnostic_id = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -290,11 +290,11 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
             self.service_name is not None and
             self.api_id is not None and
             self.diagnostic_id is not None):
-            self.results['api_diagnostic'] = self.format_item(self.get())
+            self.results['api_diagnostic'] = self.get()
         elif (self.resource_group is not None and
               self.service_name is not None and
               self.api_id is not None):
-            self.results['api_diagnostic'] = self.format_item(self.listbyservice())
+            self.results['api_diagnostic'] = self.listbyservice()
         return self.results
 
     def get(self):
@@ -316,8 +316,8 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ diagnostic_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
+        self.url = self.url.replace('{{ diagnostic_name }}', self.diagnostic_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -328,12 +328,12 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
 
     def listbyservice(self):
         response = None
@@ -353,8 +353,7 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.api_name)
-        self.url = self.url.replace('{{ diagnostic_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -365,15 +364,21 @@ class AzureRMApiDiagnosticInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

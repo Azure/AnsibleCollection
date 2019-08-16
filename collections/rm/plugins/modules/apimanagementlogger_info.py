@@ -65,9 +65,7 @@ options:
         azureEventHub logger.<br>Instrumentation key for applicationInsights
         logger.
     required: true
-    type: >-
-      unknown[DictionaryType
-      {"$id":"3331","$type":"DictionaryType","valueType":{"$id":"3332","$type":"PrimaryType","knownPrimaryType":"string","name":{"$id":"3333","fixed":false,"raw":"String"},"deprecated":false},"supportsAdditionalProperties":false,"name":{"$id":"3334","fixed":false},"deprecated":false}]
+    type: str
   is_buffered:
     description:
       - >-
@@ -89,11 +87,11 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListLoggers
-  azure.rm.apimanagementlogger.info:
+  azure.rm.apimanagementlogger_info:
     resource_group: myResourceGroup
     service_name: myService
 - name: ApiManagementGetLogger
-  azure.rm.apimanagementlogger.info:
+  azure.rm.apimanagementlogger_info:
     resource_group: myResourceGroup
     service_name: myService
     logger_id: myLogger
@@ -144,19 +142,22 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
-
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 class AzureRMLoggerInfo(AzureRMModuleBase):
     def __init__(self):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             logger_id=dict(
                 type='str'
@@ -166,10 +167,6 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
         self.resource_group = None
         self.service_name = None
         self.logger_id = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -196,10 +193,10 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
         if (self.resource_group is not None and
             self.service_name is not None and
             self.logger_id is not None):
-            self.results['logger'] = self.format_item(self.get())
+            self.results['logger'] = self.get()
         elif (self.resource_group is not None and
               self.service_name is not None):
-            self.results['logger'] = self.format_item(self.listbyservice())
+            self.results['logger'] = self.listbyservice()
         return self.results
 
     def get(self):
@@ -219,7 +216,7 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ logger_name }}', self.name)
+        self.url = self.url.replace('{{ logger_name }}', self.logger_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -230,12 +227,13 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
+
 
     def listbyservice(self):
         response = None
@@ -253,7 +251,6 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ logger_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -264,15 +261,22 @@ class AzureRMLoggerInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

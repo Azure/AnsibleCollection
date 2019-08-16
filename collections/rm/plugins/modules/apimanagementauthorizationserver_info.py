@@ -165,11 +165,11 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListAuthorizationServers
-  azure.rm.apimanagementauthorizationserver.info:
+  azure.rm.apimanagementauthorizationserver_info:
     resource_group: myResourceGroup
     service_name: myService
 - name: ApiManagementGetAuthorizationServer
-  azure.rm.apimanagementauthorizationserver.info:
+  azure.rm.apimanagementauthorizationserver_info:
     resource_group: myResourceGroup
     service_name: myService
     authsid: myAuthorizationServer
@@ -220,7 +220,11 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 
 class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
@@ -228,11 +232,11 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             authsid=dict(
                 type='str'
@@ -242,10 +246,6 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
         self.resource_group = None
         self.service_name = None
         self.authsid = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -272,10 +272,10 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
         if (self.resource_group is not None and
             self.service_name is not None and
             self.authsid is not None):
-            self.results['authorization_server'] = self.format_item(self.get())
+            self.results['authorization_server'] = self.get()
         elif (self.resource_group is not None and
               self.service_name is not None):
-            self.results['authorization_server'] = self.format_item(self.listbyservice())
+            self.results['authorization_server'] = self.listbyservice()
         return self.results
 
     def get(self):
@@ -295,7 +295,7 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ authorization_server_name }}', self.name)
+        self.url = self.url.replace('{{ authorization_server_name }}', self.authsid)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -306,12 +306,12 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
 
     def listbyservice(self):
         response = None
@@ -329,7 +329,6 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ authorization_server_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -340,15 +339,21 @@ class AzureRMAuthorizationServerInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

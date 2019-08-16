@@ -34,11 +34,11 @@ options:
   expand_api_version_set:
     description:
       - Include full ApiVersionSet resource in response
-    type: boolean
+    type: bool
   include_not_tagged_apis:
     description:
       - Include not tagged APIs.
-    type: boolean
+    type: bool
   api_id:
     description:
       - >-
@@ -100,7 +100,7 @@ options:
             API, true - API is included into closed products only, false - API
             is included into open products alone, null - there is a mix of
             products.
-        type: boolean
+        type: bool
   subscription_key_parameter_names:
     description:
       - Protocols over which API is made available.
@@ -127,11 +127,11 @@ options:
   is_current:
     description:
       - Indicates if API revision is current api revision.
-    type: boolean
+    type: bool
   is_online:
     description:
       - Indicates if API revision is accessible via the gateway.
-    type: boolean
+    type: bool
   api_revision_description:
     description:
       - Description of the Api Revision.
@@ -149,7 +149,7 @@ options:
       - >-
         Specifies whether an API or Product subscription is required for
         accessing the API.
-    type: boolean
+    type: bool
   source_api_id:
     description:
       - API identifier of the source API.
@@ -223,20 +223,11 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListApis
-  azure.rm.apimanagementapi.info:
-    resource_group: myResourceGroup
-    service_name: myService
-- name: ApiManagementListApisByTags
-  azure.rm.apimanagementapi.info:
+  azure.rm.apimanagementapi_info:
     resource_group: myResourceGroup
     service_name: myService
 - name: ApiManagementGetApiContract
-  azure.rm.apimanagementapi.info:
-    resource_group: myResourceGroup
-    service_name: myService
-    api_id: myApi
-- name: ApiManagementGetApiRevisionContract
-  azure.rm.apimanagementapi.info:
+  azure.rm.apimanagementapi_info:
     resource_group: myResourceGroup
     service_name: myService
     api_id: myApi
@@ -287,25 +278,28 @@ import json
 from ansible.module_utils.azure_rm_common import AzureRMModuleBase
 from ansible.module_utils.azure_rm_common_rest import GenericRestClient
 from copy import deepcopy
-from msrestazure.azure_exceptions import CloudError
-
+try:
+  from msrestazure.azure_exceptions import CloudError
+except ImportError:
+  # This is handled in azure_rm_common
+  pass
 
 class AzureRMApiInfo(AzureRMModuleBase):
     def __init__(self):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             expand_api_version_set=dict(
-                type='boolean'
+                type='bool'
             ),
             include_not_tagged_apis=dict(
-                type='boolean'
+                type='bool'
             ),
             api_id=dict(
                 type='str'
@@ -318,10 +312,6 @@ class AzureRMApiInfo(AzureRMModuleBase):
         self.expand_api_version_set = None
         self.include_not_tagged_apis = None
         self.api_id = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -348,13 +338,13 @@ class AzureRMApiInfo(AzureRMModuleBase):
         if (self.resource_group is not None and
             self.service_name is not None and
             self.api_id is not None):
-            self.results['api'] = self.format_item(self.get())
+            self.results['api'] = self.get()
         elif (self.resource_group is not None and
               self.service_name is not None):
-            self.results['api'] = self.format_item(self.listbytags())
+            self.results['api'] = self.listbytags()
         elif (self.resource_group is not None and
               self.service_name is not None):
-            self.results['api'] = self.format_item(self.listbyservice())
+            self.results['api'] = self.listbyservice()
         return self.results
 
     def get(self):
@@ -374,7 +364,7 @@ class AzureRMApiInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.name)
+        self.url = self.url.replace('{{ api_name }}', self.api_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -385,12 +375,12 @@ class AzureRMApiInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
 
     def listbytags(self):
         response = None
@@ -408,7 +398,6 @@ class AzureRMApiInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -419,12 +408,12 @@ class AzureRMApiInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
     def listbyservice(self):
         response = None
@@ -442,7 +431,6 @@ class AzureRMApiInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ api_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -453,15 +441,21 @@ class AzureRMApiInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():

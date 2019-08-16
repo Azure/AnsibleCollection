@@ -40,3 +40,38 @@
   apimanagementidentityprovider
   apimanagementlogger
   apimanagementsubscription
+# version 0.0.5
+  apimanagementservice_info
+  apimanagementapi_info
+  apimanagementapischema_info
+  apimanagementapitagdescription_info
+  apimanagementcache_info
+  apimanagementgroup_info
+  apimanagementgroupuser_info
+  apimanagementnotification_info
+  apimanagementnotificationrecipientemail_info
+  apimanagementnotificationrecipientuser_info
+  apimanagementopenidconnectprovider_info
+  apimanagementpolicy_info
+  apimanagementproduct_info
+  apimanagementproductapi_info
+  apimanagementproductgroup_info
+  apimanagementproductpolicy_info
+  apimanagementproperty_info
+  apimanagementtag_info
+  apimanagementuser_info
+  apimanagementapidiagnostic_info
+  apimanagementapiissue_info
+  apimanagementapiissueattachment_info
+  apimanagementapiissuecomment_info
+  apimanagementapioperation_info
+  apimanagementapioperationpolicy_info
+  apimanagementapipolicy_info
+  apimanagementapirelease_info
+  apimanagementapiversionset_info
+  apimanagementauthorizationserver_info
+  apimanagementbackend_info
+  apimanagementdiagnostic_info
+  apimanagementidentityprovider_info
+  apimanagementlogger_info
+  apimanagementsubscription_info

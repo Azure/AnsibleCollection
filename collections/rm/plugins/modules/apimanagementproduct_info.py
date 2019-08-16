@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 #!/usr/bin/python
 #
 # Copyright (c) 2019 Zim Kalinowski, (@zikalino)
@@ -120,15 +121,15 @@ author:
 
 EXAMPLES = '''
 - name: ApiManagementListProducts
-  azure.rm.apimanagementproduct.info:
+  azure.rm.apimanagementproduct_info:
     resource_group: myResourceGroup
     service_name: myService
 - name: ApiManagementListProductsByTags
-  azure.rm.apimanagementproduct.info:
+  azure.rm.apimanagementproduct_info:
     resource_group: myResourceGroup
     service_name: myService
 - name: ApiManagementGetProduct
-  azure.rm.apimanagementproduct.info:
+  azure.rm.apimanagementproduct_info:
     resource_group: myResourceGroup
     service_name: myService
     product_id: myProduct
@@ -187,17 +188,17 @@ class AzureRMProductInfo(AzureRMModuleBase):
         self.module_arg_spec = dict(
             resource_group=dict(
                 type='str',
-                required=true
+                required=True
             ),
             service_name=dict(
                 type='str',
-                required=true
+                required=True
             ),
             expand_groups=dict(
-                type='boolean'
+                type='bool'
             ),
             include_not_tagged_products=dict(
-                type='boolean'
+                type='bool'
             ),
             product_id=dict(
                 type='str'
@@ -210,10 +211,6 @@ class AzureRMProductInfo(AzureRMModuleBase):
         self.tags = None
         self.include_not_tagged_products = None
         self.product_id = None
-        self.id = None
-        self.name = None
-        self.type = None
-        self.properties = None
 
         self.results = dict(changed=False)
         self.mgmt_client = None
@@ -266,7 +263,7 @@ class AzureRMProductInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.name)
+        self.url = self.url.replace('{{ product_name }}', self.product_id)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -277,12 +274,12 @@ class AzureRMProductInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return self.format_item(results)
 
     def listbytags(self):
         response = None
@@ -300,7 +297,6 @@ class AzureRMProductInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -311,12 +307,12 @@ class AzureRMProductInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
     def listbyservice(self):
         response = None
@@ -334,7 +330,6 @@ class AzureRMProductInfo(AzureRMModuleBase):
         self.url = self.url.replace('{{ subscription_id }}', self.subscription_id)
         self.url = self.url.replace('{{ resource_group }}', self.resource_group)
         self.url = self.url.replace('{{ service_name }}', self.service_name)
-        self.url = self.url.replace('{{ product_name }}', self.name)
 
         try:
             response = self.mgmt_client.query(self.url,
@@ -345,15 +340,21 @@ class AzureRMProductInfo(AzureRMModuleBase):
                                               self.status_code,
                                               600,
                                               30)
-            results['temp_item'] = json.loads(response.text)
+            results = json.loads(response.text)
             # self.log('Response : {0}'.format(response))
         except CloudError as e:
             self.log('Could not get info for @(Model.ModuleOperationNameUpper).')
 
-        return results
+        return [self.format_item(x) for x in results['value']] if results['value'] else []
 
-    def format_item(item):
-        return item
+    def format_item(self, item):
+        d = {
+            'id': item['id'],
+            'name': item['name'],
+            'type': item['type'],
+            'properties': item['properties']
+        }
+        return d
 
 
 def main():
