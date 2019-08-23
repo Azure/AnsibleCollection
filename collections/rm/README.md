@@ -75,3 +75,6 @@
   apimanagementidentityprovider_info
   apimanagementlogger_info
   apimanagementsubscription_info
+# version 0.0.6:
+  openshiftmanagedcluster
+  openshiftmanagedcluster_info
